@@ -2,72 +2,82 @@ int choice = 0;
 int aNum = 0;
 int bNum = 0;
 
-bool hasChoice = false;
-bool hasA = false;
-bool hasB = false;
+enum State
+{
+    WAIT_CHOICE,
+    WAIT_A,
+    WAIT_B
+};
 
-void resetAll();
-void Blink();
+State state = WAIT_CHOICE;
+
+void showMenu()
+{
+    Serial.println();
+    Serial.println("1 = Sum");
+    Serial.println("2 = Multiplication");
+    Serial.print("Choose operation: ");
+}
 
 void setup()
 {
     Serial.begin(9600);
     delay(50);
-    Serial.println("1 = Sum");
-    Serial.println("2 = Multiplication");
+
+    showMenu();
 }
 
 void loop()
 {
-    Blink();
-}
+    if (Serial.available() <= 0)
+        return;
 
-void resetAll()
-{
-    hasChoice = false;
-    hasA = false;
-    hasB = false;
-}
+    String input = Serial.readStringUntil('\n');
+    input.trim();
 
-void Blink()
-{
-    if (Serial.available() > 0)
+    if (input.length() == 0)
+        return;
+
+    int inp = input.toInt();
+
+    switch (state)
     {
-        int inp = Serial.parseInt();
+        case WAIT_CHOICE:
+            if (inp == 1 || inp == 2)
+            {
+                choice = inp;
 
-        if (!hasChoice && (inp == 1 || inp == 2))
-        {
-            choice = inp;
-            hasChoice = true;
-        }
-        else if (!hasA)
-        {
+                Serial.print("Enter number A: ");
+                state = WAIT_A;
+            }
+            else
+            {
+                Serial.println("Invalid choice. Enter 1 or 2:");
+            }
+            break;
+
+        case WAIT_A:
             aNum = inp;
-            hasA = true;
-        }
-        else if (!hasB)
-        {
+
+            Serial.print("Enter number B: ");
+            state = WAIT_B;
+            break;
+
+        case WAIT_B:
             bNum = inp;
-            hasB = true;
-        }
-    }
 
-    if (hasChoice && hasA && hasB)
-    {
-        int result;
+            int result;
 
-        if (choice == 1)
-        {
-            result = aNum + bNum;
-        }
-        else
-        {
-            result = aNum * bNum;
-        }
+            if (choice == 1)
+                result = aNum + bNum;
+            else
+                result = aNum * bNum;
 
-        Serial.print("Result: ");
-        Serial.println(result);
+            Serial.print("Result: ");
+            Serial.println(result);
 
-        resetAll();
+            state = WAIT_CHOICE;
+            showMenu();
+            break;
     }
 }
