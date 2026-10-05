@@ -62,7 +62,7 @@ void Blink()
         }
         else
         {
-            // result = aNum * bNum;
+            result = aNum * bNum;
         }
 
         Serial.print("Result: ");
