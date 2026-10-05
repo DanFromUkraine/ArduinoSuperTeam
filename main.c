@@ -58,7 +58,7 @@ void Blink()
 
         if (choice == 1)
         {
-            // result = aNum + bNum;
+            result = aNum + bNum;
         }
         else
         {
